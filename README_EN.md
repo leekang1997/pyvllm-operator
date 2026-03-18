@@ -23,6 +23,19 @@ This project packages those repeated steps into a simpler Python interface.
 - centralizes model path, port, and GPU configuration
 - supports embedding inference services directly into experiment scripts
 
+## Prerequisites
+
+This repository does not replace `vLLM` itself. It is a Python-side wrapper and launcher layer built on top of `vLLM`.
+
+Before using it, you should already have:
+
+1. a working `vLLM` installation
+2. locally available model weights
+3. a usable GPU / CUDA runtime
+4. a clear idea of which model path, port, and GPU devices you want to use
+
+Without a working `vLLM` environment, this repository can organize the calling pattern, but it cannot run inference by itself.
+
 ## Why This Project Exists
 
 For many first-time vLLM users, the real pain point is not inference itself, but how to integrate vLLM cleanly into their own Python workflow.
@@ -38,10 +51,13 @@ This project exists to turn those repeated startup and invocation steps into a c
 
 A common usage path is:
 
-1. Define a `VLLMConfig` with model path, served model name, port, and GPU devices.
-2. Use `build_vllm_command` or `start_vllm_server` to launch the local service.
-3. Use `OpenAICompatClient` to send chat requests.
-4. Embed the client into your own experiment, evaluation, or service code.
+1. Install and validate `vLLM` first.
+2. Prepare a local model-weight directory.
+3. Define a `VLLMConfig` with model path, served model name, port, and GPU devices.
+4. Use `build_vllm_command` or `start_vllm_server` to launch the local service.
+5. Confirm that the service is reachable through an OpenAI-compatible endpoint.
+6. Use `OpenAICompatClient` to send chat requests.
+7. Embed the client into your own experiment, evaluation, or service code.
 
 It is especially useful for:
 
@@ -62,6 +78,30 @@ The current repository is intentionally lightweight and organized around three l
   - sends requests through an OpenAI-compatible interface so upper-layer code does not need to manage low-level details directly
 
 This separation lets your experiment code focus on which model to call, instead of repeatedly reimplementing startup and request logic.
+
+## What Needs To Be Configured
+
+At minimum, you should configure:
+
+- `model_path`
+  - the local path to your model weights
+- `served_model_name`
+  - the public-facing model name served by vLLM
+- `port`
+  - the local inference port
+- `gpu_devices`
+  - the GPU ids allowed for the job
+- `api_key`
+  - the API key used by the OpenAI-compatible client, even if it is only a placeholder
+- `activation_command`
+  - an optional environment-activation command if you rely on a specific conda setup
+
+The key boundary is:
+
+- this repository makes vLLM easier to launch and call
+- `vLLM` still performs the actual inference work
+
+So if the model path, GPU runtime, or vLLM installation is broken, this wrapper layer will not bypass that problem.
 
 ## How It Helps Others
 
@@ -130,6 +170,21 @@ pyvllm-operator/
 ## Quick Start
 
 ```bash
+pip install vllm openai
+
+# prepare your local model path first
 pip install -r requirements.txt
 python examples/start_server.py
 ```
+
+## A More Accurate Mental Model
+
+It is best to think about this project as:
+
+- a Python runtime wrapper around `vLLM`
+- not a brand-new inference engine
+
+So the practical order is:
+
+- install `vLLM` first
+- then use this repository to standardize startup and invocation
