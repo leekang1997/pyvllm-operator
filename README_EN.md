@@ -4,6 +4,14 @@
 
 `PyVLLM-Operator` is a lightweight Python wrapper for vLLM aimed at lowering the cost of local experiments, service startup, and script-level inference integration.
 
+## At A Glance
+
+- Project type: a Python runtime wrapper around `vLLM`
+- Core goal: unify service launch, invocation, and configuration management
+- Best for: developers building local inference experiments, evaluation flows, or service wrappers
+- Dependency: requires a working `vLLM` installation first
+- Current stage: initial open-source release focused on lightweight runtime abstraction
+
 ## Project Positioning
 
 vLLM is strong at high-performance inference, but in practice developers still need to manually handle:
