@@ -23,6 +23,53 @@ This project packages those repeated steps into a simpler Python interface.
 - centralizes model path, port, and GPU configuration
 - supports embedding inference services directly into experiment scripts
 
+## Why This Project Exists
+
+For many first-time vLLM users, the real pain point is not inference itself, but how to integrate vLLM cleanly into their own Python workflow.
+
+- the service has to be started manually
+- ports, model names, and GPU devices are easy to lose track of
+- debugging often jumps between shell commands, HTTP requests, and Python scripts
+- once multiple models or experiments are involved, the calling pattern becomes messy
+
+This project exists to turn those repeated startup and invocation steps into a cleaner Python runtime abstraction.
+
+## How To Use It
+
+A common usage path is:
+
+1. Define a `VLLMConfig` with model path, served model name, port, and GPU devices.
+2. Use `build_vllm_command` or `start_vllm_server` to launch the local service.
+3. Use `OpenAICompatClient` to send chat requests.
+4. Embed the client into your own experiment, evaluation, or service code.
+
+It is especially useful for:
+
+- local single-node experiments
+- prompt iteration and inference benchmarking
+- lightweight research-side inference wrappers
+- teams that want to integrate vLLM into an existing Python codebase quickly
+
+## How The Project Works
+
+The current repository is intentionally lightweight and organized around three layers:
+
+- `config.py`
+  - defines model path, port, device, and API-related runtime parameters
+- `launcher.py`
+  - builds the vLLM launch command and starts the service process
+- `client.py`
+  - sends requests through an OpenAI-compatible interface so upper-layer code does not need to manage low-level details directly
+
+This separation lets your experiment code focus on which model to call, instead of repeatedly reimplementing startup and request logic.
+
+## How It Helps Others
+
+- helps researchers plug vLLM into experiments faster
+- helps engineers standardize how inference is invoked across scripts
+- helps teams separate the inference runtime layer from business logic
+- helps newcomers understand the vLLM usage path with less friction
+
 ## What Is Already Included In This Repo
 
 - `pyvllm_operator/config.py`
